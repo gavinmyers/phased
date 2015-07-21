@@ -1,0 +1,109 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ji</title>
+<body>
+<script src="phaser.js"></script>
+<script src="taffy.js"></script>
+<script src="souls.js"></script>
+<script src="zaps.js"></script>
+<script src="map.js"></script>
+<script>
+var sprites = TAFFY([]);
+var game = new Phaser.Game(1024, 768, Phaser.CANVAS, 'game');
+
+var PhaserGame = function () {
+  this.cursors = null;
+  this.player = null;
+  this.attack = null;
+  this.enemy = null;
+  this.zaps = null;
+  this.interactions = [];
+};
+
+PhaserGame.prototype = {
+  init: function () {
+    this.game.renderer.renderSession.roundPixels = false;
+    this.game.stage.backgroundColor = '#dedede' 
+    this.game.camera.roundPx = false;
+    this.physics.startSystem(Phaser.Physics.ARCADE);
+    this.physics.arcade.gravity.y = 800;
+  },
+
+  preload: function () {
+    //graphics go here
+    Soul.preload(this);
+    Zaps.preload(this);
+    Map.preload(this);
+    this.zaps = this.add.group();
+  },
+
+  create: function () {
+    Map.create('sky',this);
+    Map.create('background',this);
+
+    this.player = Soul.create('mage',this,1,1);
+    this.attack = Zaps.create('missile',this,this.player);
+    this.enemy = Soul.create('spider',this,1,1);
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.shoot = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.camera.follow(this.player);
+
+    Map.create('tile',this);
+  },
+
+  impact: function(s1,s2) {
+    if(s1.zap) {
+      s1.zap.impact(this,s2,s1);
+    } else if(s2.zap) {
+      s2.zap.impact(this,s1,s2);
+    }
+  },
+  interact: function(s1,s2) {
+    console.log(s1); 
+    console.log(s2); 
+  },
+  update: function () {
+    for(var i in this.interactions) {
+      var interaction = this.interactions[i];
+      this.physics.arcade.overlap(this.player, interaction, this.interact, null, this);
+    }
+
+    game.physics.arcade.overlap(this.enemy, this.zaps, this.impact, null, this);
+    game.physics.arcade.overlap(this.layer, this.zaps, this.impact, null, this);
+    this.physics.arcade.collide(this.player, this.stationary);
+    this.physics.arcade.collide(this.player, this.layer);
+
+    this.physics.arcade.collide(this.enemy, this.stationary);
+    this.physics.arcade.collide(this.enemy, this.layer);
+
+    Soul.go(this.player,'update');
+    Soul.go(this.enemy,'update');
+
+    Soul.go(this.enemy,'right');
+
+    this.player.body.velocity.x = 0;
+    if(this.cursors.up.isDown) {
+      Soul.go(this.player,'jump');
+    }
+
+    if (this.cursors.left.isDown) {
+        Soul.go(this.player,'left');
+    } else if (this.cursors.right.isDown) {
+        Soul.go(this.player,'right');
+    } else if (this.cursors.down.isDown) {
+        Soul.go(this.player,'duck');
+    }
+        
+    if (this.shoot.isDown) {
+      if (this.cursors.left.isDown) {
+        Zaps.zap(this,this.attack,this.player,'left');
+      } else if (this.cursors.right.isDown) {
+        Zaps.zap(this,this.attack,this.player,'right');
+      }
+    }
+  }
+};
+game.state.add('Game', PhaserGame, true);
+</script>
+</body>
+.
