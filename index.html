@@ -17,6 +17,7 @@ var PhaserGame = function () {
   this.attack = null;
   this.enemy = null;
   this.zaps = null;
+  this.ladders = null;
   this.interactions = [];
 };
 
@@ -45,12 +46,21 @@ PhaserGame.prototype = {
     this.attack = Zaps.create('missile',this,this.player);
     this.enemy = Soul.create('spider',this,1,1);
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.shoot = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.shoot = this.input.keyboard.addKey(Phaser.Keyboard.Z);
+    this.jump = this.input.keyboard.addKey(Phaser.Keyboard.X);
     this.camera.follow(this.player);
 
     Map.create('tile',this);
   },
+  descend: function(s1,s2) {
+    this.player.body.allowGravity = false;
+    this.player.body.velocity.y = 100;
+  },
 
+  ascend: function(s1,s2) {
+    this.player.body.allowGravity = false;
+    this.player.body.velocity.y = -100;
+  },
   impact: function(s1,s2) {
     if(s1.zap) {
       s1.zap.impact(this,s2,s1);
@@ -70,11 +80,18 @@ PhaserGame.prototype = {
 
     game.physics.arcade.overlap(this.enemy, this.zaps, this.impact, null, this);
     game.physics.arcade.overlap(this.layer, this.zaps, this.impact, null, this);
-    this.physics.arcade.collide(this.player, this.stationary);
     this.physics.arcade.collide(this.player, this.layer);
-
-    this.physics.arcade.collide(this.enemy, this.stationary);
     this.physics.arcade.collide(this.enemy, this.layer);
+
+      var onladder = this.physics.arcade.overlap(this.player, this.ladders, null, null, this);
+      this.player.body.allowGravity = !onladder;
+      
+    if (this.cursors.up.isDown) {
+      this.physics.arcade.overlap(this.player, this.ladders, this.ascend, null, this);
+    }
+    if (this.cursors.down.isDown) {
+      this.physics.arcade.overlap(this.player, this.ladders, this.descend, null, this);
+    }
 
     Soul.go(this.player,'update');
     Soul.go(this.enemy,'update');
@@ -82,7 +99,7 @@ PhaserGame.prototype = {
     Soul.go(this.enemy,'right');
 
     this.player.body.velocity.x = 0;
-    if(this.cursors.up.isDown) {
+    if(this.jump.isDown) {
       Soul.go(this.player,'jump');
     }
 

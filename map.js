@@ -13,28 +13,44 @@ Map.types = [];
 
 Map.types['tile'] = {
   preload: function(game) {
+    game.load.spritesheet('red', 'debug/red.png?r='+Math.random(), 32, 32);
     game.load.spritesheet('tile', 'debug/tile.png?r='+Math.random(), 32, 32);
     game.load.tilemap('level1', 'debug/level1.json?r='+Math.random(), null, Phaser.Tilemap.TILED_JSON);
 
   },
   create: function(game) {
-
     var map = game.add.tilemap('level1');
     map.addTilesetImage('tile', 'tile');
 
+
+
     var layer = map.createLayer('platform');
 
-    var interactionLayer = map.createLayer('interaction_1');
-    console.log(interactionLayer);
-    console.log(interactionLayer.layer.properties.type);
+    map.setCollisionByExclusion([],true,layer);
+
+    var interactionLayer = map.createLayer('interactions');
     game.interactions.push(interactionLayer);
 
     map.createLayer('foreground');
     
     game.map = map;
-    map.setCollisionByExclusion([],true,layer);
     game.layer = layer;
     game.physics.arcade.enable(map);
+
+    game.ladders = game.add.group();
+    for(var i in map.objects.ladders) {
+      var l1 = map.objects.ladders[i];
+      var lad1 = game.add.sprite(l1.x, l1.y, 'red');
+      game.physics.arcade.enable(lad1);
+      lad1.body.allowGravity = false;
+      lad1.alpha = 0.0;
+      lad1.body.immovable = true;
+      lad1.body.setSize(l1.width, l1.height);
+      lad1.width = l1.width;
+      lad1.height = l1.height;
+      game.ladders.add(lad1);
+    }
+
   }
 };
 
