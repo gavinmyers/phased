@@ -124,7 +124,7 @@ Soul.types['mage'] = {
       m.animations.add('climb-up',[40,41,42,43],12,true);
       m.animations.add('open-right',[44,45],12,true);
       m.animations.add('open-left',[46,47],12,true);
-      m.animations.add('cast',[48,49,50,51,52,53,54,55],12,true);
+      m.animations.add('cast',[48,49,50,51],12,true);
       m.animations.add('cast-right',[56,57,58,59,60,61,62,63],12,true);
       m.animations.add('cast-left',[65,66,67,68,69,70,71],12,true);
       game.physics.arcade.enable(m);

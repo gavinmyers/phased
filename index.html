@@ -35,7 +35,6 @@ PhaserGame.prototype = {
     Soul.preload(this);
     Zaps.preload(this);
     Map.preload(this);
-    this.zaps = this.add.group();
   },
 
   create: function () {
@@ -43,6 +42,7 @@ PhaserGame.prototype = {
     Map.create('background',this);
 
     this.player = Soul.create('mage',this,1,1);
+    this.zaps = this.add.group();
     this.attack = Zaps.create('missile',this,this.player);
     this.enemy = Soul.create('spider',this,1,1);
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -61,6 +61,15 @@ PhaserGame.prototype = {
     this.player.body.allowGravity = false;
     this.player.body.velocity.y = -100;
   },
+  gameEvent: function(s1,s2) {
+    if(s1.gameAction) {
+      s1.gameAction(this,s2);
+    }
+    if(s2.gameAction) {
+      s2.gameAction(this,s1);
+    }
+
+  },
   impact: function(s1,s2) {
     if(s1.zap) {
       s1.zap.impact(this,s2,s1);
@@ -78,13 +87,16 @@ PhaserGame.prototype = {
       this.physics.arcade.overlap(this.player, interaction, this.interact, null, this);
     }
 
+    game.physics.arcade.overlap(this.player, this.events, this.gameEvent, null, this);
+
     game.physics.arcade.overlap(this.enemy, this.zaps, this.impact, null, this);
-    game.physics.arcade.overlap(this.layer, this.zaps, this.impact, null, this);
+    game.physics.arcade.overlap(this.player, this.zaps, this.impact, null, this);
     this.physics.arcade.collide(this.player, this.layer);
     this.physics.arcade.collide(this.enemy, this.layer);
 
-      var onladder = this.physics.arcade.overlap(this.player, this.ladders, null, null, this);
-      this.player.body.allowGravity = !onladder;
+    this.physics.arcade.overlap(this.player, this.events, this.gameEvent, null, this);
+    var onladder = this.physics.arcade.overlap(this.player, this.ladders, null, null, this);
+    this.player.body.allowGravity = !onladder;
       
     if (this.cursors.up.isDown) {
       this.physics.arcade.overlap(this.player, this.ladders, this.ascend, null, this);
@@ -118,6 +130,7 @@ PhaserGame.prototype = {
         Zaps.zap(this,this.attack,this.player,'right');
       }
     }
+    //console.log(this.zaps);
   }
 };
 game.state.add('Game', PhaserGame, true);

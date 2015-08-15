@@ -22,9 +22,9 @@ Map.types['tile'] = {
     var map = game.add.tilemap('level1');
     map.addTilesetImage('tile', 'tile');
 
-
-
     var layer = map.createLayer('platform');
+
+    map.createLayer('background');
 
     map.setCollisionByExclusion([],true,layer);
 
@@ -40,17 +40,50 @@ Map.types['tile'] = {
     game.ladders = game.add.group();
     for(var i in map.objects.ladders) {
       var l1 = map.objects.ladders[i];
-      var lad1 = game.add.sprite(l1.x, l1.y, 'red');
-      game.physics.arcade.enable(lad1);
-      lad1.body.allowGravity = false;
-      lad1.alpha = 0.0;
-      lad1.body.immovable = true;
-      lad1.body.setSize(l1.width, l1.height);
-      lad1.width = l1.width;
-      lad1.height = l1.height;
-      game.ladders.add(lad1);
+      var ldr = game.add.sprite(l1.x, l1.y, 'red');
+      game.physics.arcade.enable(ldr);
+      ldr.body.allowGravity = false;
+      ldr.alpha = 0.0;
+      ldr.body.immovable = true;
+      ldr.body.setSize(l1.width, l1.height);
+      ldr.width = l1.width;
+      ldr.height = l1.height;
+      game.ladders.add(ldr);
     }
 
+    game.events = game.add.group();
+    for(var i in map.objects.events) {
+      var l1 = map.objects.events[i];
+      var action = l1.properties.action;
+      var evt = game.add.sprite(l1.x, l1.y, 'red');
+      evt.gameAction = action;
+      evt.gameAction = function(game) {
+        for(k = 0; k < 100; k++) {
+          return;
+          var s = game.add.sprite(Math.random() * 100, Math.random() * 100, 'red');
+          game.physics.arcade.enable(s);
+          s.alpha = 1;
+          s.body.allowGravity = false;
+          s.body.immovable = true;
+          s.tint = "#ffffff";
+          s.body.setSize(Math.random() * 100, Math.random() * 100);
+          s.width = Math.random() * 100; 
+          s.height = Math.random() * 100; 
+        }
+        evt.gameAction = function(game) {}
+      };
+      console.log(l1);
+      console.log(evt);
+      game.physics.arcade.enable(evt);
+      evt.body.allowGravity = false;
+      evt.alpha = 0.0;
+      evt.body.immovable = true;
+      evt.body.setSize(l1.width, l1.height);
+      evt.width = l1.width;
+      evt.height = l1.height;
+      game.events.add(evt);
+
+    }
   }
 };
 

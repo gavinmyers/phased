@@ -35,13 +35,15 @@ Zaps.zap.common['right'] = function(game,zap,soul,dir) {
   bullet.body.velocity.x = vx; 
   bullet.checkWorldBounds = true;
   bullet.outOfBoundsKill = true;
-  
+  game.zaps.add(bullet);
+   
+  soul.animations.play('cast');
   if(dir == 'left') {
-    soul.animations.play('cast-left');
+    //soul.animations.play('cast-left');
   } else if(dir == 'right') {
-    soul.animations.play('cast-right');
+    //soul.animations.play('cast-right');
   } else {
-    soul.animations.play('cast');
+    //soul.animations.play('cast');
   }
 }
 
@@ -53,7 +55,7 @@ Zaps.types = {};
 
 Zaps.types['missile'] = {
   preload:function(game) {
-    game.load.spritesheet('spell', 'debug/spell.png', 32, 48);
+    game.load.spritesheet('spell', 'debug/spell.png', 12, 12);
   },
   create:function(game,soul) {
     var m = {};
@@ -64,15 +66,14 @@ Zaps.types['missile'] = {
       bullet.zap = m;
       game.physics.arcade.enable(bullet);
       bullet.body.gravity.y = -700;
-      game.zaps.add(bullet);
       return bullet;
     }
     m.impact = function(game,soul,bullet) {
       if(soul.kill) {
-        soul.kill();
+        //soul.kill();
       }
       if(bullet.kill) {
-        bullet.kill();
+        //bullet.kill();
       }
     }
     return m;
